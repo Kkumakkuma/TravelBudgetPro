@@ -1,0 +1,34 @@
+title: TravelBudgetPro
+description: "Your ultimate guide to budget travel tips, destination guides, and money-saving travel hacks for every adventurer."
+url: "https://kkumakkuma.github.io"
+baseurl: "/TravelBudgetPro"
+permalink: /:year/:month/:day/:title/
+future: true
+
+theme: minima
+
+author:
+  name: TravelBudgetPro
+  email: ""
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      comments: true
+
+google_analytics: "G-5L40K3SBQT"
+
+exclude:
+  - scripts/
+  - .github/
+  - README.md
+  - Gemfile
+  - Gemfile.lock

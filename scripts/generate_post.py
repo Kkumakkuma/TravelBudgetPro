@@ -1,126 +1,220 @@
 """
-TravelBudgetPro Auto Post Generator
-Generates SEO-optimized budget travel articles using OpenAI GPT API
-and commits them to the blog repository.
+TravelBudgetPro Auto Post Generator v2
+- GPT generates unique long-tail keyword topics dynamically
+- used_topics.json prevents any duplicate content
+- High-CPC keywords + FAQ sections for Google featured snippets
+- Internal linking to boost SEO
 """
 
 from openai import OpenAI
 import datetime
+import json
 import os
 import random
 import re
 
-# High CPC keyword categories for budget travel
-TOPIC_POOLS = {
-    "budget_travel": [
-        "How to Travel Europe on $50 a Day in {year}",
-        "{number} Ways to Save Money on Your Next Vacation",
-        "How to Travel the World on a Tight Budget",
-        "Budget Travel Guide: Southeast Asia for Under $30 a Day",
-        "How to Plan an Affordable Dream Vacation in {year}",
-        "{number} Countries Where Your Dollar Goes the Furthest",
-        "How to Travel Full-Time on a Part-Time Budget",
-    ],
-    "destinations": [
-        "Best Budget-Friendly Destinations in Europe for {year}",
-        "{number} Cheapest Countries to Visit in {year}",
-        "Best Affordable Beach Destinations Around the World",
-        "Top {number} Underrated Travel Destinations That Won't Break the Bank",
-        "Best Cities for Budget Travelers in South America",
-        "Affordable Island Getaways You Need to Visit in {year}",
-        "{number} Hidden Gem Destinations for Budget Travelers",
-    ],
-    "travel_tips": [
-        "Best Travel Credit Cards for Saving Money in {year}",
-        "How to Find Cheap Flights: {number} Proven Strategies",
-        "How to Get Free Hotel Upgrades Every Time",
-        "{number} Travel Apps That Save You Hundreds of Dollars",
-        "How to Use Travel Rewards Points Like a Pro",
-        "Best Time to Book Flights for the Cheapest Fares in {year}",
-        "How to Negotiate Better Prices While Traveling Abroad",
-    ],
-    "packing": [
-        "Packing Light: How to Travel with Just a Carry-On",
-        "The Ultimate Packing Checklist for Budget Travelers",
-        "{number} Packing Mistakes That Cost You Money",
-        "Best Travel Gear Under $50 for {year}",
-        "How to Pack for a Two-Week Trip in a Backpack",
-        "Minimalist Packing Guide: {number} Items You Actually Need",
-        "Best Carry-On Backpacks for Budget Travel in {year}",
-    ],
-    "solo_travel": [
-        "Solo Travel Safety Tips: {number} Rules to Follow",
-        "Best Destinations for Solo Travelers on a Budget in {year}",
-        "How to Meet People While Traveling Solo",
-        "Solo Female Travel Safety Guide for {year}",
-        "{number} Reasons Why Solo Travel Is Worth It",
-        "How to Save Money as a Solo Traveler",
-        "Best Hostels for Solo Travelers in Europe",
-    ],
-    "food_travel": [
-        "How to Eat Like a Local on a Budget in Any Country",
-        "{number} Street Food Destinations Every Foodie Must Visit",
-        "How to Save Money on Food While Traveling",
-        "Best Food Markets Around the World for Budget Travelers",
-        "How to Cook While Traveling: {number} Easy Hostel Recipes",
-        "Cheapest Countries for Amazing Food in {year}",
-        "Street Food Safety Tips: How to Eat Safely Abroad",
-    ],
-    "travel_hacks": [
-        "{number} Travel Hacks That Save You Serious Money",
-        "How to Find Mistake Fares and Error Prices on Flights",
-        "Best Budget Airlines Around the World in {year}",
-        "How to Get Airport Lounge Access for Free",
-        "Travel Hack: How to Fly Business Class on a Budget",
-        "{number} Secret Websites for Finding Cheap Travel Deals",
-        "How to Use VPNs to Find Cheaper Flights and Hotels",
-    ],
-}
+BLOG_NAME = "TravelBudgetPro"
+BLOG_NICHE = "budget travel"
+BLOG_DESCRIPTION = "Travel the world without breaking the bank - tips, guides, and hacks."
 
-SYSTEM_PROMPT = """You are an expert travel writer for a blog called TravelBudgetPro.
-Write SEO-optimized, informative, and engaging blog posts about budget travel, destinations, and money-saving travel strategies.
+CATEGORIES = [
+    "budget-travel",     "destinations",     "travel-tips",     "packing",
+    "solo-travel",     "food-travel",     "travel-hacks",     "flight-deals",
+    "hostel-guide",     "travel-insurance",     "backpacking",     "road-trips",
+    "travel-rewards",     "digital-nomad",     "travel-safety",
+]
 
-Rules:
-- Write in a friendly, adventurous but practical tone
-- Use short paragraphs (2-3 sentences max)
-- Include practical, actionable tips with specific dollar amounts where possible
-- Use headers (##) to break up sections
-- Include bullet points and numbered lists where appropriate
-- Write between 1200-1800 words
-- Naturally include the main keyword 3-5 times
-- Include a compelling introduction that hooks the reader
-- End with a clear conclusion/call-to-action
-- Do NOT include any AI disclaimers or mentions of being AI-generated
-- Write as if you are a seasoned budget traveler sharing personal experience and expertise
-- Include specific costs, hostel/hotel price ranges, and daily budget breakdowns
-- Mention specific tools, apps, and websites travelers can use
-- Include safety tips where appropriate
-- Do NOT use markdown title (# Title) - just start with the content
+SYSTEM_PROMPT = """You are an expert budget travel writer for TravelBudgetPro.
+You write SEO-optimized, highly informative articles that rank on Google.
+
+Writing rules:
+- Friendly, conversational but authoritative tone (like a trusted financial advisor friend)
+- Short paragraphs (2-3 sentences max)
+- Use ## for section headers (H2) and ### for subsections (H3)
+- Include bullet points and numbered lists
+- Write 1500-2200 words
+- Naturally weave the main keyword throughout (4-6 times)
+- Start with a hook that addresses the reader's pain point
+- Include specific numbers, percentages, and real examples
+- End with a clear actionable takeaway
+- Do NOT use markdown title (# Title) - start directly with content
+- Do NOT include AI disclaimers
+- Write as a travel writer who has visited 40+ countries on a budget sharing expertise
+
+SEO rules:
+- Include a "Frequently Asked Questions" section at the end with 3-4 Q&As using ### for each question
+- Use power words in subheadings (Ultimate, Essential, Proven, Complete)
+- Write in second person ("you") to engage readers
+- Include comparison elements (vs, compared to, better than)
+- Add year references where relevant for freshness
 """
 
 
-def pick_topic():
-    """Select a random topic from the pools."""
-    year = datetime.datetime.now().year
-    number = random.choice([3, 5, 7, 10, 12, 15])
-    category = random.choice(list(TOPIC_POOLS.keys()))
-    title_template = random.choice(TOPIC_POOLS[category])
-    title = title_template.format(year=year, number=number)
-    return title, category
+def get_repo_root():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(script_dir)
 
 
-def generate_post_content(title, category):
-    """Generate a blog post using OpenAI GPT API."""
+def load_used_topics():
+    """Load previously used topic slugs."""
+    filepath = os.path.join(get_repo_root(), "scripts", "used_topics.json")
+    if os.path.exists(filepath):
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def save_used_topics(topics):
+    filepath = os.path.join(get_repo_root(), "scripts", "used_topics.json")
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(topics, f, indent=2)
+
+
+def get_existing_slugs():
+    """Get all existing post slugs from _posts/."""
+    posts_dir = os.path.join(get_repo_root(), "_posts")
+    slugs = set()
+    if os.path.exists(posts_dir):
+        for filename in os.listdir(posts_dir):
+            if filename.endswith(".md"):
+                # Remove date prefix and .md suffix
+                slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", filename[:-3])
+                # Normalize: remove trailing random numbers
+                slug = re.sub(r"-\d{2,3}$", "", slug)
+                slugs.add(slug)
+    return slugs
+
+
+def get_recent_titles(limit=10):
+    """Get recent post titles for internal linking context."""
+    posts_dir = os.path.join(get_repo_root(), "_posts")
+    titles = []
+    if os.path.exists(posts_dir):
+        files = sorted(os.listdir(posts_dir), reverse=True)
+        for filename in files[:limit]:
+            if filename.endswith(".md"):
+                filepath = os.path.join(posts_dir, filename)
+                with open(filepath, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith("title:"):
+                            title = line.split(":", 1)[1].strip().strip('"')
+                            titles.append(title)
+                            break
+    return titles
+
+
+def slugify(title):
+    slug = title.lower()
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"[\s]+", "-", slug)
+    slug = re.sub(r"-+", "-", slug)
+    return slug.strip("-")
+
+
+def generate_unique_topic(used_topics, existing_slugs):
+    """Ask GPT to generate a unique, high-CPC long-tail keyword topic."""
     client = OpenAI()
+    year = datetime.datetime.now().year
+    category = random.choice(CATEGORIES)
+
+    used_list = "\n".join(f"- {t}" for t in used_topics[-50:]) if used_topics else "(none yet)"
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        max_tokens=4000,
+        max_tokens=200,
+        temperature=1.0,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    f"You generate blog post titles for a {BLOG_NICHE} blog. "
+                    "Generate exactly ONE unique, SEO-optimized blog title.\n\n"
+                    "Requirements:\n"
+                    "- Long-tail keyword (5-12 words) that people actually search on Google\n"
+                    "- High commercial intent (topics where advertisers pay high CPC)\n"
+                    "- Specific and actionable (not generic)\n"
+                    "- Include numbers, year, or power words when natural\n"
+                    f"- Relevant to {year}\n"
+                    "- MUST be completely different from the used titles below\n"
+                    "- DO NOT just rephrase an existing title\n\n"
+                    "Reply with ONLY the title, nothing else."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Category: {category.replace('-', ' ')}\n\n"
+                    f"Already used titles (DO NOT repeat or rephrase these):\n{used_list}\n\n"
+                    "Generate one new unique title:"
+                ),
+            },
+        ],
+    )
+
+    title = response.choices[0].message.content.strip().strip('"').strip("'")
+    slug = slugify(title)
+
+    # Verify it's actually unique
+    norm_slug = re.sub(r"-\d{2,3}$", "", slug)
+    if norm_slug in existing_slugs or norm_slug in [slugify(t) for t in used_topics[-100:]]:
+        # Retry once with stronger instruction
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=200,
+            temperature=1.2,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        f"Generate a COMPLETELY NEW and UNIQUE {BLOG_NICHE} blog title. "
+                        f"Category: {category.replace('-', ' ')}. "
+                        f"This MUST NOT overlap with any existing content. "
+                        f"Think of a specific subtopic or angle that hasn't been covered. "
+                        f"Use long-tail keywords (6-12 words). Year: {year}. "
+                        "Reply with ONLY the title."
+                    ),
+                },
+                {"role": "user", "content": "Generate:"},
+            ],
+        )
+        title = response.choices[0].message.content.strip().strip('"').strip("'")
+        slug = slugify(title)
+
+    return title, category, slug
+
+
+def generate_post_content(title, category, recent_titles):
+    """Generate high-quality blog post with FAQ and internal linking."""
+    client = OpenAI()
+
+    internal_links_hint = ""
+    if recent_titles:
+        links = "\n".join(f"- {t}" for t in recent_titles[:5])
+        internal_links_hint = (
+            f"\n\nFor internal linking, naturally reference 1-2 of these related articles "
+            f"where relevant (use the exact title in a mention like "
+            f"'as we covered in [Article Title]'):\n{links}"
+        )
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        max_tokens=5000,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {
                 "role": "user",
-                "content": f"Write a comprehensive blog post with the title: \"{title}\"\n\nCategory: {category.replace('_', ' ')}\n\nRemember to write 1200-1800 words, use ## for section headers, and make it SEO-friendly with practical budget travel advice.",
+                "content": (
+                    f'Write a comprehensive blog post titled: "{title}"\n\n'
+                    f"Category: {category.replace('-', ' ')}\n\n"
+                    "Structure:\n"
+                    "1. Hook intro (address the reader's problem)\n"
+                    "2. 4-6 detailed sections with ## headers\n"
+                    "3. Practical tips with specific examples\n"
+                    "4. FAQ section (## Frequently Asked Questions) with 3-4 ### questions\n"
+                    "5. Brief conclusion with call-to-action\n\n"
+                    "Write 1500-2200 words. Make it genuinely helpful and unique."
+                    f"{internal_links_hint}"
+                ),
             },
         ],
     )
@@ -128,84 +222,75 @@ def generate_post_content(title, category):
     return response.choices[0].message.content
 
 
-def slugify(title):
-    """Convert title to URL-friendly slug."""
-    slug = title.lower()
-    slug = re.sub(r'[^a-z0-9\s-]', '', slug)
-    slug = re.sub(r'[\s]+', '-', slug)
-    slug = re.sub(r'-+', '-', slug)
-    slug = slug.strip('-')
-    return slug
-
-
-def get_repo_root():
-    """Get the repository root directory."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.dirname(script_dir)
-
-
-def get_existing_titles():
-    """Get titles of existing posts to avoid duplicates."""
-    posts_dir = os.path.join(get_repo_root(), '_posts')
-    titles = set()
-    if os.path.exists(posts_dir):
-        for filename in os.listdir(posts_dir):
-            if filename.endswith('.md'):
-                title_part = filename[11:-3]
-                titles.add(title_part)
-    return titles
+def generate_meta_description(title):
+    """Generate a unique, compelling meta description."""
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Write a compelling meta description for a blog post. "
+                    "150-160 characters max. Include the main keyword. "
+                    "Add a call-to-action. Reply with ONLY the description."
+                ),
+            },
+            {"role": "user", "content": f"Title: {title}"},
+        ],
+    )
+    desc = response.choices[0].message.content.strip().strip('"')
+    return desc[:160]
 
 
 def create_post():
-    """Generate and save a new blog post."""
-    existing = get_existing_titles()
+    """Generate and save a new unique blog post."""
+    used_topics = load_used_topics()
+    existing_slugs = get_existing_slugs()
+    recent_titles = get_recent_titles(10)
 
-    # Try up to 10 times to find a non-duplicate topic
-    for _ in range(10):
-        title, category = pick_topic()
-        slug = slugify(title)
-        if slug not in existing:
-            break
-    else:
-        title, category = pick_topic()
-        slug = slugify(title) + f"-{random.randint(100, 999)}"
-
+    title, category, slug = generate_unique_topic(used_topics, existing_slugs)
     print(f"Generating post: {title}")
     print(f"Category: {category}")
 
-    content = generate_post_content(title, category)
+    content = generate_post_content(title, category, recent_titles)
+    description = generate_meta_description(title)
 
-    # Create the post file
     today = datetime.datetime.now()
-    date_str = today.strftime('%Y-%m-%d')
+    date_str = today.strftime("%Y-%m-%d")
     filename = f"{date_str}-{slug}.md"
 
-    posts_dir = os.path.join(get_repo_root(), '_posts')
+    posts_dir = os.path.join(get_repo_root(), "_posts")
     os.makedirs(posts_dir, exist_ok=True)
-
     filepath = os.path.join(posts_dir, filename)
 
-    # Create frontmatter
     frontmatter = f"""---
 layout: post
 title: "{title}"
 date: {today.strftime('%Y-%m-%d %H:%M:%S')} +0000
-categories: [{category.replace('_', '-')}]
-description: "{title} - Practical budget travel tips and guides for every adventurer."
+categories: [{category}]
+description: "{description}"
+tags: [{category}, {BLOG_NICHE.replace(' ', '-')}, {today.year}]
 ---
 
 {content}
 """
 
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(frontmatter)
+
+    # Track used topic
+    used_topics.append(title)
+    save_used_topics(used_topics)
 
     print(f"Post saved: {filepath}")
     return filepath, filename
 
-if __name__ == '__main__':
-    # Every 5th post: generate a Gumroad promo post
+
+if __name__ == "__main__":
     from promo_post import should_write_promo, create_promo_post
+
     if should_write_promo():
         print("Generating promotional post...")
         filepath, filename = create_promo_post()

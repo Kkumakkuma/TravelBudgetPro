@@ -7,6 +7,8 @@ description: "Curious about living in a van as a digital nomad? Discover the rea
 tags: [digital-nomad, budget-travel, 2026]
 ---
 
+![I Tried Living in a Van for 30 Days - Here's What It Costs as a Digital Nomad in 2026](/TravelBudgetPro/assets/pin-images/2026-04-30-i-tried-living-in-a-van-for-30-days-heres-what-it-costs-as-a-digital-nomad-in-2026.png)
+
 I spent $2,400 on living in a van for 30 days, and it was one of the most eye-opening experiences of my life. In March 2026, I threw caution to the wind and traded my city apartment for a 22-foot camper van. As a digital nomad, I wanted to explore the financial implications, lifestyle benefits, and potential pitfalls of this increasingly popular way of life. Spoiler alert: it’s not as glamorous as some might think, but with the right mindset and planning, it can be incredibly rewarding.
 
 ## How I Researched This

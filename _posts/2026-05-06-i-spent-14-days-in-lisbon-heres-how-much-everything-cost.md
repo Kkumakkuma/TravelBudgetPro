@@ -7,6 +7,8 @@ description: "Discover the true cost of a 14-day adventure in Lisbon! Dive into 
 tags: [destinations, budget-travel, 2026]
 ---
 
+![I Spent 14 Days in Lisbon: Here's How Much Everything Cost](/TravelBudgetPro/assets/pin-images/2026-05-06-i-spent-14-days-in-lisbon-heres-how-much-everything-cost.png)
+
 It was April 2023 when I finally set foot in Lisbon, and I was determined to stretch my budget without missing out on the magic this city offers. I carefully tracked every expense over the 14 days, and to my surprise, I ended up spending just $1,500 — much less than I expected for a European capital! The thrill of discovering hidden gems while keeping my spending in check made the experience unforgettable. With this detailed breakdown, you can get a clear picture of what you might spend during a 14-day adventure in Lisbon, and I’ll share the tips I learned for saving money along the way.
 
 ## How I Researched This

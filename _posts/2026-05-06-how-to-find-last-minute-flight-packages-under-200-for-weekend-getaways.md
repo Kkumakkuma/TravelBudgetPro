@@ -7,6 +7,8 @@ description: "Discover tips on how to find last-minute flight packages under $20
 tags: [flight-deals, budget-travel, 2026]
 ---
 
+![How to Find Last-Minute Flight Packages Under $200 for Weekend Getaways](/TravelBudgetPro/assets/pin-images/2026-05-06-how-to-find-last-minute-flight-packages-under-200-for-weekend-getaways.png)
+
 I once snagged a round-trip flight to San Diego for just $150 in May 2023. I still vividly remember the excitement when I realized I’d be spending a weekend in the sun without breaking the bank. If you think landing a last-minute flight package under $200 is impossible, you're in for a delightful surprise. In my experience as a budget traveler, I’ve developed strategies that let you chase weekend getaways without feeling guilty about your wallet. Let’s roll up our sleeves and explore how you can find these golden opportunities!
 
 ## How I Researched This

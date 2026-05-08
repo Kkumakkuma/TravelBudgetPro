@@ -6,6 +6,8 @@ categories: [planning, travel-tips]
 description: "A complete step-by-step guide to planning your next trip, from choosing a destination to packing your bags."
 ---
 
+![How to Plan a Perfect Trip from Scratch (Step by Step)](/TravelBudgetPro/assets/pin-images/2026-04-06-how-to-plan-a-perfect-trip-from-scratch-step-by-step.png)
+
 Planning a trip should be exciting, not overwhelming. But between flights, accommodations, activities, packing, and budgeting, it is easy to feel lost before you even leave home.
 
 This guide breaks trip planning into **simple, sequential steps** so you never miss a detail and actually enjoy the planning process.

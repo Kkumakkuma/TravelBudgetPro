@@ -7,6 +7,8 @@ description: "Discover if booking flights directly is worth it in 2026! Read my 
 tags: [flight-deals, budget-travel, 2026]
 ---
 
+![Is Booking Flights Directly Worth It in 2026? My 6-Month Experience](/TravelBudgetPro/assets/pin-images/2026-05-04-is-booking-flights-directly-worth-it-in-2026-my-6-month-experience.png)
+
 By the end of my recent six-month travel experiment, I realized that I could have saved nearly $1,500 on flight tickets had I chosen to book directly through airline websites instead of third-party booking platforms. In February 2026, I had a few round-trip flights planned from Seoul to Tokyo and back to Singapore, and just like many travelers, I thought I was getting the best deal by booking through comparison sites. But, after extensive testing and price comparisons, the results surprised me. The more I probed into the numbers, the clearer my path became — was booking flights directly worth it?
 
 ## How I Researched This

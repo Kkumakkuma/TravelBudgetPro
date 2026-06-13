@@ -92,6 +92,11 @@
   </script>
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5723595008598292" crossorigin="anonymous"></script>
+  {% if site.travelpayouts_drive %}
+  <!-- Travelpayouts Drive (AI affiliate optimizer). Activated only when site.travelpayouts_drive: true in _config.yml.
+       Paste the account-specific Drive <script> from https://app.travelpayouts.com/tools/539061#installation BELOW this line.
+       Kept inert by default so live pages stay unchanged during AdSense re-review. -->
+  {% endif %}
 </head>
 <body>
   <header>

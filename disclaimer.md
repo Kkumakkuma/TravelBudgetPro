@@ -3,6 +3,8 @@ layout: default
 title: "Disclaimer"
 permalink: /disclaimer/
 description: "Important disclaimers regarding the information on TravelBudgetPro."
+noindex: true
+sitemap: false
 ---
 
 # Disclaimer
